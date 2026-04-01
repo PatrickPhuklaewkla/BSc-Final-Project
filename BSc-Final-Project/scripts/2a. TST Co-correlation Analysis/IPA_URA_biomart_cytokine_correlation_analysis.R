@@ -47,7 +47,7 @@ cytokine_genes <- biomart_go %>%
   unique()
 
 ipa <- ipa %>%
-  filter(B.H.corrected.p.value < 0.05 & Predicted.Activation.State == "Activated" & Upstream.Regulator %in% cytokine_genes) %>%
+  filter(B.H.corrected.p.value < 0.05 & Upstream.Regulator %in% cytokine_genes) %>%
   select(Upstream.Regulator, Molecule.Type, B.H.corrected.p.value, Target.Molecules.in.Dataset)
 colnames(ipa) <- c("regulator","type","FDR","target")
 ipa <- tibble::rowid_to_column(ipa, "ID") #add an ID column corresponding to each cluster

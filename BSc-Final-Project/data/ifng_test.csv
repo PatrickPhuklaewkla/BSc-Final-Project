@@ -1,0 +1,3 @@
+upstream_regulator,downstream.gene,TST.response.gene,non.TST.response.gene
+IFNG,Yes,1125,2529
+IFNG,No,1404,14828

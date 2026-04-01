@@ -1,5 +1,3 @@
-setwd("../Bsc-Final-Project/data/")
-
 library(tidyverse)
 
 ## Step 0: config settings ####
@@ -53,7 +51,6 @@ if (!is.null(top_n)) {
   ipa_use <- slice_head(ipa_use, n = top_n)
   string_use <- slice_head(string_use, n = top_n)
 }
-
 
 max_len <- max(nrow(ipa_use), nrow(string_use))
 
@@ -217,7 +214,7 @@ p <- ggplot(paired_df) +
   
   labs(
     y = paste0("Rank (1 = best ", rank_metric, ")"),
-    title = paste0("Adjusted P-value Rank Comparison: Shared Regulators")
+    title = paste0("Shared Cytokine Regulator Rank Comparison")
   )
 
 # ---- SAVE ----

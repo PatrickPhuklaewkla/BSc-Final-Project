@@ -196,7 +196,7 @@ p <- ggplot(paired_df) +
   scale_fill_identity() +
   scale_colour_identity() +
   
-  scale_y_reverse(
+  scale_y_reverse(,
     expand = expansion(mult = c(0.02, 0.02))
   ) +
   
@@ -217,7 +217,7 @@ p <- ggplot(paired_df) +
   
   labs(
     y = paste0("Rank (1 = best ", rank_metric, ")"),
-    title = paste0("Adjusted P-value Rank Comparison: Shared Regulators")
+    title = paste0("Shared Cytokine Regulator Rank Comparison")
   )
 
 # ---- SAVE ----

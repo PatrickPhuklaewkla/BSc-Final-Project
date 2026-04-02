@@ -11,34 +11,55 @@ ipa <- read_csv("biomart_cytokine_restricted_IPA_URA_TSTd2vsSaline_fdrsig_648siz
 string <- read_csv("cytokine_restricted_STRING_URA_TSTd2vsSaline_fdrsig_1309size.csv",
                    show_col_types = FALSE)
 
+cytosig <- read_csv("TST CytoSig/cytokine_restricted_cytosig_formatted_significant_UR_output.csv",
+                    show_col_types = FALSE)
+
 # Unique regulator sets
 ipa_regs <- unique(ipa$regulator)
 string_regs <- unique(string$regulator)
+cytosig_regs <- unique(cytosig$regulator)
 
-# Counts
+# Areas
 area1 <- length(ipa_regs)
 area2 <- length(string_regs)
-cross_area <- length(intersect(ipa_regs, string_regs))
+area3 <- length(cytosig_regs)
 
-# Draw horizontal Venn
-venn.plot <- draw.pairwise.venn(
+# Overlaps
+n12 <- length(intersect(ipa_regs, string_regs))
+n13 <- length(intersect(ipa_regs, cytosig_regs))
+n23 <- length(intersect(string_regs, cytosig_regs))
+n123 <- length(Reduce(intersect, list(ipa_regs, string_regs, cytosig_regs)))
+
+# Draw publication-style Venn
+venn.plot <- draw.triple.venn(
   area1 = area1,
   area2 = area2,
-  cross.area = cross_area,
-  category = c("IPA", "STRING"),
-  fill = c("#E69F00", "#009E73"),   # Orange, Green
-  alpha = 0.6,
-  cat.pos = c(-90, 90),             # Adjust label position
-  cat.dist = c(0.05, 0.05),
-  cex = 1.5,
+  area3 = area3,
+  n12 = n12,
+  n13 = n13,
+  n23 = n23,
+  n123 = n123,
+  
+  category = c("IPA", "STRING", "CytoSig"),
+  
+  fill = c("#D55E00", "#009E73", "#0072B2"),
+  alpha = c(0.5, 0.5, 0.5),
+  
+  lwd = 2,
+  col = "black",
+  
+  cex = 1.6,
+  fontface = "bold",
+  
   cat.cex = 1.4,
-  scaled = TRUE,                     # Proportional areas
-  margin = 0.06,
-  ext.dist = 0.05,
-  ext.length = 0.9
+  cat.fontface = "bold",
+  cat.dist = c(0.08, 0.08, 0.06),
+  cat.pos = c(-20, 20, 170),
+  
+  margin = 0.1
 )
 
-# Save as vector PDF
-pdf("URA_IPA_vs_STRING_Venn_Diagram.pdf", width = 7, height = 5)
+# Save high-quality vector figure
+pdf("URA_IPA_STRING_CytoSig_Venn_publication.pdf", width = 8, height = 7)
 grid.draw(venn.plot)
 dev.off()

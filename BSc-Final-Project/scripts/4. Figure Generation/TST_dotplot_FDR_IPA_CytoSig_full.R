@@ -6,7 +6,7 @@ library(dplyr)
 ## Step 0: config settings ####
 top_n <- NULL
 gradient_mode <- "global"   # "global" or "local"
-rank_metric <- "adj_pvalue" # "FDR" or "adj_pvalue"
+rank_metric <- "FDR" # "FDR" or "adj_pvalue"
 
 ipa_file    <- "biomart_cytokine_restricted_IPA_URA_TSTd2vsSaline_fdrsig_648size.csv"
 string_file <- "TST CytoSig/cytokine_restricted_cytosig_formatted_significant_UR_output.csv"
@@ -27,6 +27,9 @@ missing_col <- "#F2F0EF"
 ## Step 1: Load files ####
 ipa <- read_csv(ipa_file, show_col_types = FALSE)
 string <- read_csv(string_file, show_col_types = FALSE)
+
+string <- string %>%
+  rename(FDR = adj_pvalue) # cytosig exclusive modification
 
 ## Step 2: Validate rank column ####
 check_metric <- function(df, metric, label){
@@ -144,8 +147,9 @@ p <- ggplot(paired_df) +
   scale_colour_identity() +
   
   scale_y_reverse(
-    limits = c(max_len, 1),
-    expand = expansion(mult = c(0.02, 0.02))
+    limits = c(max(c(nrow(ipa_ranks), nrow(string_ranks))) + 1, 1),
+    breaks = c(1, seq(20, max(c(nrow(ipa_ranks), nrow(string_ranks))), by = 20)),
+    expand = expansion(add = c(0, 0.6))
   ) +
   
   scale_x_continuous(
@@ -165,7 +169,7 @@ p <- ggplot(paired_df) +
   
   labs(
     y = paste0("Rank (1 = best ", rank_metric, ")"),
-    title = "Cytokine Regulator Rank Comparison"
+    title = "FDR Rank Comparison: All Regulators"
   )
 
 ## Step 9: Save ####

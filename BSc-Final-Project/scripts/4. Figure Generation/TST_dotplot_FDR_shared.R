@@ -5,7 +5,7 @@ library(tidyverse)
 ## Step 0: config settings ####
 top_n <- NULL                     # NULL = all URAs
 gradient_mode <- "global"       # "global" or "local"
-rank_metric <- "adj_pvalue"     # "FDR" or "adj_pvalue"
+rank_metric <- "FDR"     # "FDR" or "adj_pvalue"
 
 ipa_file    <- "biomart_cytokine_restricted_IPA_URA_TSTd2vsSaline_fdrsig_648size.csv"
 string_file <- "cytokine_restricted_STRING_URA_TSTd2vsSaline_fdrsig_1309size.csv"
@@ -80,15 +80,6 @@ string_ranks <- string_full %>%
 
 paired_df <- inner_join(ipa_ranks, string_ranks, by = "regulator")
 shared_regs <- paired_df$regulator
-
-wilcox_res <- wilcox.test(
-  paired_df$ipa_rank,
-  paired_df$string_rank,
-  paired = TRUE,
-  alternative = "two.sided"
-)
-
-print(wilcox_res)
 
 # ---- OPTIONAL TOP-N FILTER ----
 if (!is.null(top_n)) {
@@ -196,7 +187,9 @@ p <- ggplot(paired_df) +
   scale_colour_identity() +
   
   scale_y_reverse(
-    expand = expansion(mult = c(0.02, 0.02))
+    limits = c(nrow(paired_df) + 1, 1),
+    breaks = c(1, pretty(2:nrow(paired_df))),
+    expand = expansion(add = c(0, 0.6))
   ) +
   
   scale_x_continuous(
@@ -216,7 +209,7 @@ p <- ggplot(paired_df) +
   
   labs(
     y = paste0("Rank (1 = best ", rank_metric, ")"),
-    title = paste0("Adjusted P-value Rank Comparison: Shared Regulators")
+    title = paste0("FDR Rank Comparison: Shared Regulators")
   )
 
 # ---- SAVE ----
@@ -230,3 +223,14 @@ ggsave(
   height = max_len * 0.06,
   device = cairo_pdf
 )
+
+# ---- Wilcoxon Signed Rank Test ----
+
+wilcox_res <- wilcox.test(
+  paired_df$ipa_rank,
+  paired_df$string_rank,
+  paired = TRUE,
+  alternative = "two.sided"
+)
+
+print(wilcox_res)

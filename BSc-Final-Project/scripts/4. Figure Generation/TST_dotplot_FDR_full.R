@@ -6,7 +6,7 @@ library(dplyr)
 ## Step 0: config settings ####
 top_n <- NULL
 gradient_mode <- "global"   # "global" or "local"
-rank_metric <- "adj_pvalue" # "FDR" or "adj_pvalue"
+rank_metric <- "FDR" # "FDR" or "adj_pvalue"
 
 ipa_file    <- "biomart_cytokine_restricted_IPA_URA_TSTd2vsSaline_fdrsig_648size.csv"
 string_file <- "cytokine_restricted_STRING_URA_TSTd2vsSaline_fdrsig_1309size.csv"
@@ -143,7 +143,11 @@ p <- ggplot(paired_df) +
   scale_fill_identity() +
   scale_colour_identity() +
   
-  scale_y_reverse(expand = expansion(mult = c(0.02,0.02))) +
+  scale_y_reverse(
+    limits = c(max(c(nrow(ipa_ranks), nrow(string_ranks))) + 1, 1),
+    breaks = c(1, seq(20, max(c(nrow(ipa_ranks), nrow(string_ranks))), by = 20)),
+    expand = expansion(add = c(0, 0.6))
+  ) +
   
   scale_x_continuous(
     breaks = c(1,2),
@@ -162,7 +166,7 @@ p <- ggplot(paired_df) +
   
   labs(
     y = paste0("Rank (1 = best ", rank_metric, ")"),
-    title = "IPA vs STRING URA: Adjusted P-value Rank Comparison"
+    title = "FDR Rank Comparison: All Regulators"
   )
 
 ## Step 9: Save ####
@@ -175,3 +179,14 @@ ggsave(
   height = max_len * 0.12,
   device = cairo_pdf
 )
+
+# ---- Wilcoxon Signed Rank Test ----
+
+wilcox_res <- wilcox.test(
+  paired_df$ipa_rank,
+  paired_df$string_rank,
+  paired = TRUE,
+  alternative = "two.sided"
+)
+
+print(wilcox_res)

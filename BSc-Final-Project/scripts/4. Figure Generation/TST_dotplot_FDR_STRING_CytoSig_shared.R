@@ -3,10 +3,10 @@ library(tidyverse)
 ## Step 0: config settings ####
 top_n <- NULL                     # NULL = all URAs
 gradient_mode <- "global"       # "global" or "local"
-rank_metric <- "adj_pvalue"     # "FDR" or "adj_pvalue"
+rank_metric <- "FDR"     # "FDR" or "adj_pvalue"
 
-ipa_file    <- "cytokine_restricted_STRING_URA_TSTd2vsSaline_fdrsig_1309size.csv"
-string_file <- "TST CytoSig/cytokine_restricted_cytosig_formatted_significant_UR_output.csv"
+ipa_file    <- "TST CytoSig/cytokine_restricted_cytosig_formatted_significant_UR_output.csv"
+string_file <- "cytokine_restricted_STRING_URA_TSTd2vsSaline_fdrsig_1309size.csv"
 
 out_file <- paste0(
   "STRING_CytoSig_shared_dotplotURA_table_",
@@ -24,6 +24,9 @@ missing_col <- "#F2F0EF"
 ## Step 1: Load files ####
 ipa <- read_csv(ipa_file, show_col_types = FALSE)
 string <- read_csv(string_file, show_col_types = FALSE)
+
+ipa <- ipa %>%
+  rename(FDR = adj_pvalue) # cytosig exclusive modification
 
 ## Step 2: Validate rank column ####
 check_metric <- function(df, metric, label) {
@@ -78,15 +81,6 @@ string_ranks <- string_full %>%
 
 paired_df <- inner_join(ipa_ranks, string_ranks, by = "regulator")
 shared_regs <- paired_df$regulator
-
-wilcox_res <- wilcox.test(
-  paired_df$ipa_rank,
-  paired_df$string_rank,
-  paired = TRUE,
-  alternative = "two.sided"
-)
-
-print(wilcox_res)
 
 # ---- OPTIONAL TOP-N FILTER ----
 if (!is.null(top_n)) {
@@ -194,12 +188,14 @@ p <- ggplot(paired_df) +
   scale_colour_identity() +
   
   scale_y_reverse(
-    expand = expansion(mult = c(0.02, 0.02))
+    limits = c(nrow(paired_df) + 1, 1),
+    breaks = c(1, seq(5, nrow(paired_df), by = 5)),
+    expand = expansion(add = c(0, 0.6))
   ) +
   
   scale_x_continuous(
     breaks = c(1,2),
-    labels = c("STRING","CytoSig"),
+    labels = c("CytoSig","STRING"),
     limits = c(0.6, 2.4)
   ) +
   
@@ -214,8 +210,9 @@ p <- ggplot(paired_df) +
   
   labs(
     y = paste0("Rank (1 = best ", rank_metric, ")"),
-    title = paste0("Shared Cytokine Regulator Rank Comparison")
+    title = paste0("FDR Rank Comparison: Shared Regulators")
   )
+
 
 # ---- SAVE ----
 
@@ -228,3 +225,15 @@ ggsave(
   height = max_len * 0.06,
   device = cairo_pdf
 )
+
+# ---- Wilcoxon Signed Rank Test ----
+
+wilcox_res <- wilcox.test(
+  paired_df$ipa_rank,
+  paired_df$string_rank,
+  paired = TRUE,
+  alternative = "two.sided",
+  exact = FALSE
+)
+
+print(wilcox_res)

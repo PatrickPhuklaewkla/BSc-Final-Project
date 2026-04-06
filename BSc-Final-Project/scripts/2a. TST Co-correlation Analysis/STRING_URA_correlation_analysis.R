@@ -93,6 +93,51 @@ ipa_significant <- ipa_significant %>%
 
 ## G. Output file
 write.csv(ipa_significant, paste0("cytokine_restricted_STRING_URA_TSTd2vsSaline_fdrsig_",p,"size.csv"), row.names = F) # clusters with adj. p-value <= 0.05
+write.csv(random_distributions_100, paste0("random_distrib_4-",p,"size_100its_tpm_TST_avg-correl.csv"))  # change file name as appropriate (inc. iterations and range)
+write.csv(ipa_avg_corr, "ipa_avg_corr.csv", row.names = FALSE)
 
-## H. Optional Read
+#random_distributions_100 <- read.csv("random_distrib_4-600size_100its_tpm_TST_avg-correl.csv")
+
+## H. Plotting average cluster expression vs. frequency distribution
+library(ggplot2)
+
+ipa_avg_corr <- read.csv("ipa_avg_corr.csv")
+random_distributions_100 <- read.csv("random_distrib_4-1309size_100its_tpm_TST_avg-correl.csv") # read in output file from Script 2 if not running steps A-D above
+random_distributions_100_df <- as.data.frame(random_distributions_100) #plotting only works with data frame
 ipa_significant <- read.csv("cytokine_restricted_STRING_URA_TSTd2vsSaline_fdrsig_1309size.csv", header = TRUE)
+
+# load files if not running steps A-C above
+#ipa_avg_corr <- read.csv("tpm_TST_avg-correl.csv") # output file from Script 1
+
+
+# Cluster correlations with frequency distributions plot
+random_genes_plot <- ggplot(ipa_avg_corr, aes(avg_corr, count)) + 
+  xlab("Average correlation coefficient") + ylab("Network size (number of target genes)") + 
+  #ggtitle("Average Cluster Correlation Coefficient") +
+  geom_point(data = random_distributions_100_df, aes(X97.72, size), color = "palegreen3") + 
+  geom_point(data = random_distributions_100_df, aes(X84.13, size), color = "steelblue2") +
+  geom_point(data = random_distributions_100_df, aes(X99.86, size), color = "sienna2") +
+  geom_point(color = "darkgrey")+
+  theme_light(base_size = 14)
+plot(random_genes_plot)
+
+ipa_avg_corr$significant <- ipa_avg_corr$regulator %in% ipa_significant$regulator
+ggplot(ipa_avg_corr, aes(avg_corr, count, color = significant)) +
+  xlab("Average correlation coefficient") + ylab("Network size (number of target genes)") +
+  ggtitle("Average Cluster Correlation Coefficient") +
+  geom_point() +
+  geom_point(data=random_distributions_100_df, aes(X97.72, size), color="palegreen3") +
+  geom_point(data=random_distributions_100_df, aes(X84.13, size), color="steelblue2") +
+  geom_point(data=random_distributions_100_df, aes(X99.86, size), color="sienna2") +
+  scale_color_manual(values=c("grey60","blue")) +
+  theme_light(base_size = 14)
+
+# Plotting the distributions only
+random_distributions_plot <- ggplot(random_distributions_100_df, aes(X97.72, size)) + 
+  geom_point(color = "palegreen3") +
+  xlab("Average correlation coefficient") + ylab("Network size (number of target genes)") + #replace axes names here
+  #ggtitle("Average Cluster Correlation Coefficient") + # replace title here
+  geom_point(data = random_distributions_100_df, aes(X84.13, size), color = "steelblue2") +
+  geom_point(data = random_distributions_100_df, aes(X99.86, size), color = "sienna2")+
+  theme_light(base_size = 14)
+plot(random_distributions_plot)

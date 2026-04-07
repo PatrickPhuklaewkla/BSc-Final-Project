@@ -106,21 +106,6 @@ random_distributions_100 <- read.csv("random_distrib_4-1309size_100its_tpm_TST_a
 random_distributions_100_df <- as.data.frame(random_distributions_100) #plotting only works with data frame
 ipa_significant <- read.csv("cytokine_restricted_STRING_URA_TSTd2vsSaline_fdrsig_1309size.csv", header = TRUE)
 
-# load files if not running steps A-C above
-#ipa_avg_corr <- read.csv("tpm_TST_avg-correl.csv") # output file from Script 1
-
-
-# Cluster correlations with frequency distributions plot
-random_genes_plot <- ggplot(ipa_avg_corr, aes(avg_corr, count)) + 
-  xlab("Average correlation coefficient") + ylab("Network size (number of target genes)") + 
-  #ggtitle("Average Cluster Correlation Coefficient") +
-  geom_point(data = random_distributions_100_df, aes(X97.72, size), color = "palegreen3") + 
-  geom_point(data = random_distributions_100_df, aes(X84.13, size), color = "steelblue2") +
-  geom_point(data = random_distributions_100_df, aes(X99.86, size), color = "sienna2") +
-  geom_point(color = "darkgrey")+
-  theme_light(base_size = 14)
-plot(random_genes_plot)
-
 ipa_avg_corr$significant <- ipa_avg_corr$regulator %in% ipa_significant$regulator
 ggplot(ipa_avg_corr, aes(avg_corr, count, color = significant)) +
   xlab("Average correlation coefficient") + ylab("Network size (number of target genes)") +

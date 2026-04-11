@@ -40,10 +40,11 @@ cbPalette <- c("#999999","#E69F00","#56B4E9","#009E73",
 
 setwd(".../data/")
 
-URA_raw <- fread("cytokine_restricted_STRING_URA_TSTd2vsSaline_fdrsig_1309size.csv")
+URA_raw <- fread("biomart_cytokine_restricted_IPA_URA_TSTd2vsSaline_fdrsig_648size.csv")
 
-UR_targets <- fread("cytokine_restricted_STRING_significant_UR_output.csv") %>%
-  select(regulator, overlap_genes)
+UR_targets <- fread("IPA_output_D2-TSTvsSaline.txt", header = TRUE, skip=2) %>%
+  select(regulator = 'Upstream Regulator', 
+         overlap_genes = 'Target Molecules in Dataset')
 
 URA <- URA_raw %>%
   select(regulator, FDR) %>%                # keep needed columns
@@ -80,6 +81,6 @@ nodes <- rbind(regulator,target) %>%
   select(Id,Label,Class,FDR_log) %>%
   distinct(Id,.keep_all = T)
 
-write_tsv(nodes, "IntegratedTST_URA_GephiNodes.tsv")
-write_tsv(edges, "IntegratedTST_URA_GephiEdges.tsv")
+write_tsv(nodes, "IPAIntegratedTST_URA_GephiNodes.tsv")
+write_tsv(edges, "IPAIntegratedTST_URA_GephiEdges.tsv")
 

@@ -179,14 +179,3 @@ ggsave(
   height = max_len * 0.12,
   device = cairo_pdf
 )
-
-# ---- Wilcoxon Signed Rank Test ----
-
-wilcox_res <- wilcox.test(
-  paired_df$ipa_rank,
-  paired_df$string_rank,
-  paired = TRUE,
-  alternative = "two.sided"
-)
-
-print(wilcox_res)

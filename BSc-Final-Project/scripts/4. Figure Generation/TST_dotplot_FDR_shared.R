@@ -234,3 +234,9 @@ wilcox_res <- wilcox.test(
 )
 
 print(wilcox_res)
+
+# ----Kendall correlation----
+
+test_result <- cor.test(paired_df$ipa_rank, paired_df$string_rank, method = "kendall")
+
+print(test_result)

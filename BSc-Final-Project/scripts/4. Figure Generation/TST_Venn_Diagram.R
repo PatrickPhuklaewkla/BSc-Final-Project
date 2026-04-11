@@ -54,7 +54,7 @@ venn.plot <- draw.triple.venn(
   cat.cex = 1.4,
   cat.fontface = "bold",
   cat.dist = c(0.08, 0.08, 0.06),
-  cat.pos = c(-20, 20, 170),
+  cat.pos = c(-20, 20, 0),
   
   margin = 0.1
 )

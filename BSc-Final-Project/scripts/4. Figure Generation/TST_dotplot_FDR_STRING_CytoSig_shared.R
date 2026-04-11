@@ -226,14 +226,9 @@ ggsave(
   device = cairo_pdf
 )
 
-# ---- Wilcoxon Signed Rank Test ----
+# ----Kendall correlation----
 
-wilcox_res <- wilcox.test(
-  paired_df$ipa_rank,
-  paired_df$string_rank,
-  paired = TRUE,
-  alternative = "two.sided",
-  exact = FALSE
-)
+test_result <- cor.test(paired_df$ipa_rank, paired_df$string_rank, method = "kendall")
 
-print(wilcox_res)
+print(test_result)
+

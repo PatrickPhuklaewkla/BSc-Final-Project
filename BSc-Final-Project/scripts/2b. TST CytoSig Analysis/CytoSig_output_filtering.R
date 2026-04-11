@@ -40,15 +40,15 @@ cytokine_genes <- biomart_go %>%
   dplyr::pull(hgnc_symbol) %>%
   unique()
 
-## Load CIE output file ####
-cytosig <- read.csv("data/cytosig_output.csv")
+## Load CytoSig output file ####
+cytosig <- read.csv("TST CytoSig/cytosig_output.csv")
 
-## Filter CIE file ####
+## Filter CytoSig file ####
 cytosig <- cytosig %>%
   filter(Pvalue < 0.05) %>%
-  filter(Zscore > 0) %>%
+  #filter(Zscore > 0) %>%
   filter(ID %in% cytokine_genes)
 
 ## Write to file ####
 write_csv(cytosig,
-          "data/cytokine_restricted_cytosig_significant_UR_output.csv")
+          "TST CytoSig/cytokine_restricted_cytosig_significant_UR_output.csv")

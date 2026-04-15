@@ -105,6 +105,12 @@ ipa_label_df <- plot_df %>%
 string_label_df <- plot_df %>%
   filter(method == "string_rank", regulator %in% shared_regs)
 
+ipa_exclusive_label_df <- plot_df %>%
+  filter(method == "ipa_rank", !(regulator %in% shared_regs))
+
+string_exclusive_label_df <- plot_df %>%
+  filter(method == "string_rank", !(regulator %in% shared_regs))
+
 ## Step 8: Plot ####
 p <- ggplot(paired_df) +
   
@@ -137,6 +143,26 @@ p <- ggplot(paired_df) +
     aes(x = 2.03, y = rank, label = regulator),
     hjust = 0,
     size = 3,
+    na.rm = TRUE
+  ) +
+  
+  geom_text(
+    data = ipa_exclusive_label_df,
+    aes(x = 0.97, y = rank, label = regulator),
+    hjust = 1,
+    size = 3,
+    colour = "grey70",
+    alpha = 0.9,
+    na.rm = TRUE
+  ) +
+  
+  geom_text(
+    data = string_exclusive_label_df,
+    aes(x = 2.03, y = rank, label = regulator),
+    hjust = 0,
+    size = 3,
+    colour = "grey70",
+    alpha = 0.9,
     na.rm = TRUE
   ) +
   
